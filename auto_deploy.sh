@@ -17,22 +17,19 @@ echo "📥 Pulling latest changes from GitHub..."
 git fetch origin main
 git reset --hard origin/main
 
-# Upgrade pip
-echo "⬆️ Upgrading pip, setuptools, wheel..."
+# Upgrade pip, setuptools, and wheel
+echo "⬆️  Upgrading pip, setuptools, and wheel..."
 $VENV/pip install --upgrade pip setuptools wheel
 
-# Clear old NumPy and Pandas to avoid binary incompatibility
-echo "🧹 Removing old NumPy and Pandas..."
+# Reinstall numpy and pandas cleanly
+echo "🔄 Reinstalling numpy and pandas..."
 $VENV/pip uninstall -y numpy pandas
+$VENV/pip install numpy pandas
 
-# Clear pip cache to avoid old wheels
-echo "🗑️ Clearing pip cache..."
-$VENV/pip cache purge || true
-
-# Install compatible NumPy and Pandas
-echo "🔧 Installing compatible NumPy and Pandas..."
-$VENV/pip install --no-cache-dir numpy==2.3.3
-$VENV/pip install --no-cache-dir pandas==2.1.1
+# Clear any compiled caches
+echo "🧹 Clearing Python bytecode caches..."
+find . -name "*.pyc" -delete
+find . -name "__pycache__" -type d -exec rm -rf {} +
 
 # Install the rest of the requirements without touching numpy/pandas
 echo "📦 Installing remaining requirements..."
