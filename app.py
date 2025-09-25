@@ -14,7 +14,7 @@ app.secret_key = "supersecret123"
 DB_CONFIG = {
     "host": "localhost",
     "user": "root",
-    "password": "Zain12345",
+    "password": "SecureRootPass123!",
     "database": "afaqschool1"
 }
 
