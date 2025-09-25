@@ -21,13 +21,18 @@ git reset --hard origin/main
 echo "⬆️  Upgrading pip..."
 $VENV/pip install --upgrade pip setuptools wheel
 
-# Reinstall numpy + pandas together
-echo "📦 Reinstalling numpy and pandas safely..."
-$VENV/pip install --upgrade --force-reinstall numpy==2.3.3 pandas==2.1.1
+# Clean uninstall first hanan
+$VENV/pip uninstall -y numpy pandas
 
-# Install other dependencies without touching numpy/pandas
-echo "📦 Installing other Python dependencies..."
-$VENV/pip install --upgrade -r requirements.txt --no-deps
+# Install compatible numpy first
+$VENV/pip install numpy==2.3.3
+
+# Then install pandas
+$VENV/pip install pandas==2.1.1
+
+# Now install remaining requirements WITHOUT upgrading numpy/pandas
+$VENV/pip install --upgrade --no-deps -r requirements.txt
+
 
 
 # Set permissions
