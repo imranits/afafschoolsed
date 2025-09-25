@@ -15,7 +15,7 @@ DB_CONFIG = {
     "host": "localhost",
     "user": "root",
     "password": "Zain12345",
-    "database": "afaqschool"
+    "database": "afaqschool1"
 }
 
 UPLOAD_FOLDER = "static/uploads"
