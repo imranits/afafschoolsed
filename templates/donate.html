@@ -1,0 +1,12 @@
+{% extends 'layout.html' %}
+{% block content %}
+<h3>Donate for {{ app['student_name'] }}</h3>
+<p>Total: {{ app['total_cost'] }}</p>
+<form method="post" enctype="multipart/form-data">
+  <div class="mb-3">
+    <label class="form-label">Upload Payment Receipt</label>
+    <input class="form-control" name="receipt" type="file" accept="image/*,application/pdf" required>
+  </div>
+  <button class="btn btn-success">Upload & Confirm</button>
+</form>
+{% endblock %}

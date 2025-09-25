@@ -1,0 +1,94 @@
+{% extends 'layout.html' %}
+{% block content %}
+<a href="{{ url_for('home') }}" class="btn btn-outline-primary">🏠 Home</a>
+<h3>Pending Applications</h3>
+
+<!-- Export Button -->
+<button class="btn btn-success mb-3" onclick="exportTableToExcel('applicationsTable', 'pending_applications')">
+  📊 Export to Excel
+</button>
+
+<table class="table table-bordered table-striped" id="applicationsTable">
+  <thead>
+    <tr>
+      <th>ID<br><input type="text" class="form-control form-control-sm column-filter" placeholder="Search ID"></th>
+      <th>Name<br><input type="text" class="form-control form-control-sm column-filter" placeholder="Search Name"></th>
+      <th>Is Orphan?<br>
+        <select class="form-select form-select-sm column-filter">
+          <option value="">All</option>
+          <option value="Yes">Yes</option>
+          <option value="No">No</option>
+        </select>
+      </th>
+      <th>Status<br><input type="text" class="form-control form-control-sm column-filter" placeholder="Search Status"></th>
+      <th>Action</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for a in applications %}
+      <tr>
+        <td>{{ a['application_no'] }}</td>
+        <td>{{ a['student_name'] }}</td>
+        <td>{{ a['is_orphan'] }}</td>
+        <td>{{ a['status'] }}</td>
+        <td>
+          <a class="btn btn-sm btn-outline-primary" href="{{ url_for('review_detail', application_no=a['application_no']) }}">View</a>
+        </td>
+      </tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+<!-- JS Filter Logic -->
+<script>
+document.querySelectorAll(".column-filter").forEach((filter, index) => {
+  filter.addEventListener("input", function() {
+    let rows = document.querySelectorAll("#applicationsTable tbody tr");
+    rows.forEach(row => {
+      let cells = row.querySelectorAll("td");
+      let showRow = true;
+
+      document.querySelectorAll(".column-filter").forEach((f, i) => {
+        let value = f.value.toLowerCase();
+        let cellText = cells[i]?.textContent.toLowerCase() || "";
+
+        if (f.tagName === "SELECT") {
+          if (value && cellText !== value.toLowerCase()) {
+            showRow = false;
+          }
+        } else {
+          if (value && !cellText.includes(value)) {
+            showRow = false;
+          }
+        }
+      });
+
+      row.style.display = showRow ? "" : "none";
+    });
+  });
+});
+
+/* ✅ Export Table to Excel */
+function exportTableToExcel(tableID, filename = ''){
+  let table = document.getElementById(tableID);
+  let rows = Array.from(table.querySelectorAll("tr"))
+                  .filter(row => row.style.display !== "none"); // only visible rows
+
+  let csv = [];
+  rows.forEach(row => {
+    let cols = row.querySelectorAll("th, td");
+    let rowData = [];
+    cols.forEach(col => rowData.push('"' + col.innerText.replace(/"/g, '""') + '"'));
+    csv.push(rowData.join(","));
+  });
+
+  let csvFile = new Blob([csv.join("\n")], { type: "text/csv" });
+  let downloadLink = document.createElement("a");
+  downloadLink.download = filename ? filename + ".csv" : "table.csv";
+  downloadLink.href = window.URL.createObjectURL(csvFile);
+  downloadLink.style.display = "none";
+  document.body.appendChild(downloadLink);
+  downloadLink.click();
+}
+</script>
+{% endblock %}

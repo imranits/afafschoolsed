@@ -1,0 +1,22 @@
+{% extends 'layout.html' %}
+{% block content %}
+<a href="{{ url_for('home') }}" class="btn btn-outline-primary">🏠 Home</a>
+
+<h3>Verify Payments</h3>
+<table class="table">
+  <thead><tr><th>ID</th><th>Application</th><th>Donor</th><th>Receipt</th><th>Action</th></tr></thead>
+  <tbody>
+    {% for p in payments %}
+      <tr>
+        <td>{{ p['id'] }}</td>
+        <td>{{ p['app_name'] }}</td>
+        <td>{{ p['donor_name'] }}</td>
+        <td>{% if p['receipt_path'] %}<a href="{{ url_for('uploaded_file', filename=p['receipt_path']) }}" target="_blank">View</a>{% endif %}</td>
+        <td>
+          <a class="btn btn-sm btn-success" href="{{ url_for('confirm_payment', payment_id=p['id']) }}">Confirm</a>
+        </td>
+      </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endblock %}

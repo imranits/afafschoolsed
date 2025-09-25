@@ -1,0 +1,88 @@
+{% extends 'layout.html' %}
+{% block content %}
+<div class="mb-3 text-start">
+  <a href="{{ url_for('home') }}" class="btn btn-outline-primary">🏠 Home</a>
+</div>
+
+<div class="container mt-4">
+  <h3 class="text-center">📊 Applications Report</h3>
+
+  <!-- Filter Form -->
+  <form method="get" class="row g-2 mb-3 justify-content-center">
+    <div class="col-auto">
+      <select name="status" class="form-select">
+        <option value="All" {% if status_filter == "All" %}selected{% endif %}>All Status</option>
+        <option value="Pending" {% if status_filter == "Pending" %}selected{% endif %}>Pending</option>
+        <option value="Approved" {% if status_filter == "Approved" %}selected{% endif %}>Approved</option>
+        <option value="Disapproved" {% if status_filter == "Disapproved" %}selected{% endif %}>Disapproved</option>
+        <option value="Assigned" {% if status_filter == "Assigned" %}selected{% endif %}>Assigned</option>
+        <option value="Confirmed" {% if status_filter == "Confirmed" %}selected{% endif %}>Confirmed</option>
+      </select>
+    </div>
+
+    <div class="col-auto">
+      <input type="text" name="student_filter" class="form-control" placeholder="Student Name"
+             value="{{ request.args.get('student_filter','') }}">
+    </div>
+
+    <div class="col-auto">
+      <input type="text" name="class_filter" class="form-control" placeholder="Class"
+             value="{{ request.args.get('class_filter','') }}">
+    </div>
+
+    <div class="col-auto">
+      <input type="number" name="age_filter" class="form-control" placeholder="Age"
+             value="{{ request.args.get('age_filter','') }}">
+    </div>
+
+    <div class="col-auto">
+      <input type="number" name="income_filter" class="form-control" placeholder="Father Income >= "
+             value="{{ request.args.get('income_filter','') }}">
+    </div>
+
+    <div class="col-auto">
+      <button type="submit" class="btn btn-primary">Filter</button>
+    </div>
+  </form>
+
+  <!-- Export Options -->
+  <div class="text-end mb-3">
+    <a href="{{ url_for('export_excel') }}" class="btn btn-success">⬇ Export Excel</a>
+    
+  </div>
+
+  <!-- Table -->
+  <table class="table table-bordered table-striped">
+    <thead class="table-dark">
+      <tr>
+        <th>ID</th>
+        <th>Application No</th>
+        <th>Student Name</th>
+        <th>Father Name</th>
+        <th>Mobile</th>
+        <th>Class</th>
+        <th>Age</th>
+        <th>Father Income</th>
+        <th>Status</th>
+        <th>Created At</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for app in applications %}
+      <tr>
+        <td>{{ app.id }}</td>
+        <td>{{ app.application_no }}</td>
+        <td>{{ app.student_name }}</td>
+        <td>{{ app.father_name }}</td>
+        <td>{{ app.mobile_no }}</td>
+        <td>{{ app.class }}</td>
+        <td>{{ app.age }}</td>
+        <td>{{ app.father_income }}</td>
+        <td>{{ app.status }}</td>
+        <td>{{ app.created_at }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

@@ -1,0 +1,150 @@
+{% extends 'layout.html' %}
+{% block content %}
+<div class="mb-3 text-start">
+  <a href="{{ url_for('home') }}" class="btn btn-outline-primary">🏠 Home</a>
+</div>
+
+<h3 class="mb-3 text-center">نئی رجسٹریشن</h3>
+
+<form method="post" enctype="multipart/form-data" class="p-3 border rounded bg-light">
+
+  <!-- Application No -->
+  <div class="mb-3">
+    <label class="form-label">درخواست نمبر (Application No)</label>
+    <input class="form-control" name="application_no" value="{{ application_no }}" readonly>
+  </div>
+
+  <!-- Student Name -->
+  <div class="mb-3">
+    <label class="form-label">طالب علم کا نام (Student Name)</label>
+    <input class="form-control" name="student_name" required>
+  </div>
+
+  <!-- Father Name -->
+  <div class="mb-3">
+    <label class="form-label">والد کا نام (Father Name)</label>
+    <input class="form-control" name="father_name" required>
+  </div>
+
+  <!-- Date of Birth -->
+<div class="mb-3">
+  <label class="form-label">تاریخ پیدائش (Date of Birth)</label>
+  <input id="dob" class="form-control" type="date" name="dob" required>
+</div>
+
+<!-- Student Age (Auto Calculated) -->
+<div class="mb-3">
+  <label class="form-label">عمر (Student Age)</label>
+  <input id="age" class="form-control" type="number" name="age" min="3" max="25" readonly>
+</div>
+
+  <!-- Class -->
+  <div class="mb-3">
+    <label class="form-label">کلاس (Class)</label>
+    <input class="form-control" name="class">
+  </div>
+
+  <!-- Sabika School -->
+  <div class="mb-3">
+    <label class="form-label">سابقہ اسکول (Previous School)</label>
+    <input class="form-control" name="sabika_school">
+  </div>
+
+  <!-- Father CNIC -->
+<div class="mb-3">
+  <label class="form-label">والد کا شناختی کارڈ نمبر (Father CNIC)</label>
+  <input id="father_cnic" class="form-control" name="father_cnic" maxlength="15" inputmode="numeric" placeholder="12345-1234567-1" />
+</div>
+
+<!-- Inputmask CDN -->
+<script src="https://unpkg.com/inputmask@5.0.8/dist/inputmask.min.js"></script>
+<script>
+  // mask: 5 digits - 7 digits - 1 digit
+  Inputmask({"mask": "99999-9999999-9", "autoUnmask": false}).mask(document.getElementById('father_cnic'));
+</script>
+
+<script>
+document.getElementById("dob").addEventListener("change", function() {
+  let dob = new Date(this.value);
+  let today = new Date();
+
+  if (!isNaN(dob.getTime())) {
+    let age = today.getFullYear() - dob.getFullYear();
+    let m = today.getMonth() - dob.getMonth();
+    if (m < 0 || (m === 0 && today.getDate() < dob.getDate())) {
+      age--;
+    }
+    document.getElementById("age").value = age;
+  }
+});
+</script>
+
+
+  <!-- Mobile Number -->
+  <div class="mb-3">
+    <label class="form-label">موبائل نمبر (Mobile No)</label>
+    <input class="form-control" name="mobile_no" required>
+  </div>
+
+  <!-- Father Monthly Income -->
+  <div class="mb-3">
+    <label class="form-label">والد کی ماہانہ آمدنی (Father Monthly Income)</label>
+    <input class="form-control" type="number" name="father_income">
+  </div>
+
+  <!-- Is Orphan -->
+<div class="mb-3">
+  <label class="form-label">یتیم ہے؟ (Is Orphan)</label>
+  <select class="form-control" name="is_orphan" required>
+    <option value="No">نہیں</option>
+    <option value="Yes">جی ہاں</option>
+  </select>
+</div>
+
+
+  <!-- Loss in Flood -->
+  <div class="mb-3">
+    <label class="form-label">سیلاب میں نقصان (Loss in Flood Approx.)</label>
+    <input class="form-control" type="number" name="loss_flood">
+  </div>
+
+  <!-- Required Donation % -->
+  <div class="mb-3">
+    <label class="form-label">ضروری امداد فی صد (Required Donation %)</label>
+    <input class="form-control" type="number" name="donation_percentage" min="0" max="100">
+  </div>
+
+  <!-- Picture Upload -->
+  <div class="mb-3">
+    <label class="form-label">تصویر اپ لوڈ کریں یا کیمرے سے لیں (Picture)</label>
+    <input class="form-control mb-2" name="picture" type="file" accept="image/*" capture="environment">
+    <video id="camera" width="200" height="150" autoplay style="display:none;border:1px solid #ccc;"></video>
+    <canvas id="snapshot" width="200" height="150" style="display:none;"></canvas>
+    <button type="button" class="btn btn-secondary btn-sm mt-2" onclick="startCamera()">📷 کیمرہ سے تصویر</button>
+    <input type="hidden" name="captured_image" id="captured_image">
+  </div>
+
+  <button class="btn btn-primary w-100">Submit</button>
+</form>
+
+<script>
+function startCamera() {
+  let video = document.getElementById('camera');
+  video.style.display = 'block';
+  navigator.mediaDevices.getUserMedia({ video: true }).then(stream => {
+    video.srcObject = stream;
+  });
+
+  video.addEventListener('click', () => {
+    let canvas = document.getElementById('snapshot');
+    canvas.style.display = 'block';
+    let ctx = canvas.getContext('2d');
+    ctx.drawImage(video, 0, 0, 200, 150);
+    document.getElementById('captured_image').value = canvas.toDataURL("image/png");
+    video.style.display = 'none';
+    let tracks = video.srcObject.getTracks();
+    tracks.forEach(track => track.stop());
+  });
+}
+</script>
+{% endblock %}

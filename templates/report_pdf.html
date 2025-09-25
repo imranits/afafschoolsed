@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Applications Report</title>
+  <style>
+    table { width: 100%; border-collapse: collapse; font-size: 12px; }
+    th, td { border: 1px solid black; padding: 4px; text-align: left; }
+    th { background: #ddd; }
+  </style>
+</head>
+<body>
+  <h2 style="text-align:center;">Applications Report</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Application No</th>
+        <th>Student</th>
+        <th>Father</th>
+        <th>Mobile</th>
+        <th>Status</th>
+        <th>Created</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for app in applications %}
+      <tr>
+        <td>{{ app.id }}</td>
+        <td>{{ app.application_no }}</td>
+        <td>{{ app.student_name }}</td>
+        <td>{{ app.father_name }}</td>
+        <td>{{ app.mobile_no }}</td>
+        <td>{{ app.status }}</td>
+        <td>{{ app.created_at }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</body>
+</html>

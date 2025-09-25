@@ -1,0 +1,81 @@
+{% extends "layout.html" %}
+{% block content %}
+<a href="{{ url_for('home') }}" class="btn btn-outline-primary">🏠 Home</a>
+
+<div class="container mt-4">
+  <h3 class="mb-3">Review Application</h3>
+
+  <!-- Application Info -->
+  <div class="card p-3 shadow-sm mb-4">
+  <p><strong>Application No:</strong> {{ app.application_no }}</p>
+  <p><strong>Student Name:</strong> {{ app.student_name }}</p>
+  <p><strong>Father Name:</strong> {{ app.father_name }}</p>
+  <p><strong>Date of Birth:</strong> {{ app.dob }}</p>
+  <p><strong>Mobile:</strong> {{ app.mobile }}</p>
+  <p><strong>Monthly Income:</strong> {{ app.monthly_income }}</p>
+  <p><strong>Is Orphan?</strong> {{ app.is_orphan }}</p> <!-- ✅ New Field -->
+  <p><strong>Loss Flood:</strong> {{ app.loss_flood }}</p>
+  <p><strong>Donation %:</strong> {{ app.donation_percentage }}</p>
+    
+  {% if app.picture %}
+    <p><strong>Picture:</strong><br>
+      <img src="{{ url_for('get_image', application_no=app.application_no) }}" class="img-thumbnail" width="150">
+    </p>
+  {% endif %}
+  </div>
+
+  <!-- Approve Form -->
+  <form method="post" action="{{ url_for('approve_application', application_no=app.application_no) }}" class="card p-3 shadow-sm mb-3">
+    <h5 class="mb-3">Approve with Details</h5>
+    <div class="row g-3">
+      <div class="col-md-6">
+        <label class="form-label">Class</label>
+        <input type="text" name="class_name" class="form-control" required>
+      </div>
+      <div class="col-md-6">
+        <label class="form-label">Section</label>
+        <input type="text" name="section" class="form-control" required>
+      </div>
+      <div class="col-md-4">
+        <label class="form-label">Fee</label>
+        <input type="number" id="fee" name="fee" class="form-control" required>
+      </div>
+      <div class="col-md-4">
+        <label class="form-label">Books & Stationary</label>
+        <input type="number" id="books" name="books" class="form-control" required>
+      </div>
+      <div class="col-md-4">
+        <label class="form-label">Uniform & Shoes and Bag</label>
+        <input type="number" id="uniform" name="uniform" class="form-control" required>
+      </div>
+      <div class="col-md-6">
+        <label class="form-label">Total</label>
+        <input type="number" id="total" name="total" class="form-control" readonly>
+      </div>
+    </div>
+    <button type="submit" class="btn btn-success mt-3">✅ Approve</button>
+  </form>
+
+  <!-- Reject Form -->
+  <form method="post" action="{{ url_for('reject_application', application_no=app.application_no) }}" class="mb-3">
+    <button type="submit" class="btn btn-danger">❌ Reject</button>
+  </form>
+
+  <!-- Back -->
+  <a href="{{ url_for('review') }}" class="btn btn-secondary">⬅ Back to Review List</a>
+</div>
+
+<!-- Auto Calculate Total -->
+<script>
+  function calculateTotal() {
+    let fee = parseFloat(document.getElementById("fee").value) || 0;
+    let books = parseFloat(document.getElementById("books").value) || 0;
+    let uniform = parseFloat(document.getElementById("uniform").value) || 0;
+    document.getElementById("total").value = fee + books + uniform;
+  }
+
+  document.getElementById("fee").addEventListener("input", calculateTotal);
+  document.getElementById("books").addEventListener("input", calculateTotal);
+  document.getElementById("uniform").addEventListener("input", calculateTotal);
+</script>
+{% endblock %}

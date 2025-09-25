@@ -1,0 +1,36 @@
+{% extends "layout.html" %}
+{% block content %}
+<a href="{{ url_for('home') }}" class="btn btn-outline-primary">🏠 Home</a>
+
+<div class="container mt-4">
+  <h3>Approved Applications</h3>
+  <table class="table table-bordered">
+    <thead>
+      <tr>
+        <th>Application No</th>
+        <th>Student Name</th>
+        <th>Father Name</th>
+        <th>Class</th>
+        <th>Section</th>
+        <th>Total</th>
+        <th>Action</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for app in applications %}
+      <tr>
+        <td>{{ app.application_no }}</td>
+        <td>{{ app.name }}</td>
+        <td>{{ app.father_name }}</td>
+        <td>{{ app.class_name }}</td>
+        <td>{{ app.section }}</td>
+        <td>{{ app.total }}</td>
+        <td>
+          <a href="{{ url_for('donor_view', application_no=app.application_no) }}" class="btn btn-sm btn-primary">View & Confirm</a>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

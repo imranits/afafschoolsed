@@ -1,0 +1,54 @@
+{% extends 'layout.html' %}
+{% block content %}
+<a href="{{ url_for('home') }}" class="btn btn-outline-primary">🏠 Home</a>
+
+<h3>Status Report</h3>
+
+<!-- Filters -->
+<form method="get" class="row g-3 my-2">
+  <div class="col-md-2">
+    <select name="status" class="form-select">
+      <option value="All" {% if status_filter=='All' %}selected{% endif %}>All Status</option>
+      <option value="Pending" {% if status_filter=='Pending' %}selected{% endif %}>Pending</option>
+      <option value="Approved" {% if status_filter=='Approved' %}selected{% endif %}>Approved</option>
+      <option value="Rejected" {% if status_filter=='Rejected' %}selected{% endif %}>Rejected</option>
+      <option value="Sponsored" {% if status_filter=='Sponsored' %}selected{% endif %}>Sponsored</option>
+    </select>
+  </div>
+  <div class="col-md-2">
+    <input type="text" name="student" value="{{ student_filter }}" placeholder="Student Name" class="form-control">
+  </div>
+  <div class="col-md-2">
+    <input type="text" name="class" value="{{ class_filter }}" placeholder="Class" class="form-control">
+  </div>
+  <div class="col-md-2">
+    <input type="text" name="age" value="{{ age_filter }}" placeholder="Age" class="form-control">
+  </div>
+  <div class="col-md-2">
+    <button type="submit" class="btn btn-primary">Filter</button>
+  </div>
+</form>
+
+<table class="table table-bordered mt-2">
+  <thead>
+    <tr>
+      <th>Application No</th>
+      <th>Student Name</th>
+      <th>Status</th>
+      <th>Action</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for a in apps %}
+      <tr>
+        <td>{{ a['application_no'] }}</td>
+        <td>{{ a['student_name'] }}</td>
+        <td>{{ a['status'] }}</td>
+        <td>
+          <a class="btn btn-sm btn-outline-primary" href="{{ url_for('view_application', app_id=a['id']) }}">View</a>
+        </td>
+      </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endblock %}

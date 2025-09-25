@@ -1,0 +1,13 @@
+{% extends "layout.html" %}
+{% block content %}
+<h3>Application Details</h3>
+<table class="table table-striped">
+  <tr><th>Application No</th><td>{{ app.application_no }}</td></tr>
+  <tr><th>Student Name</th><td>{{ app.name }}</td></tr>
+  <tr><th>Father Name</th><td>{{ app.father_name }}</td></tr>
+  <tr><th>Class</th><td>{{ app.class_name }}</td></tr>
+  <tr><th>Section</th><td>{{ app.section }}</td></tr>
+  <tr><th>Total</th><td>{{ app.total }}</td></tr>
+</table>
+<a href="{{ url_for('donor_confirm', application_no=app.application_no) }}" class="btn btn-success">Confirm & Upload Receipt</a>
+{% endblock %}
