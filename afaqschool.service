@@ -1,0 +1,16 @@
+[Unit]
+Description=Afaq School Flask Application
+After=network.target mysql.service
+
+[Service]
+User=www-data
+Group=www-data
+WorkingDirectory=/var/www/afaqschool
+Environment=PATH=/var/www/afaqschool/venv/bin
+ExecStart=/var/www/afaqschool/venv/bin/gunicorn --workers 3 --bind unix:/var/www/afaqschool/afaqschool.sock -m 007 app:app
+ExecReload=/bin/kill -s HUP $MAINPID
+Restart=always
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target
