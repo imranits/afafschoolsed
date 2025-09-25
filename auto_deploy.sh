@@ -8,9 +8,17 @@ VENV="$APP_DIR/venv/bin"
 echo "🚀 Updating Afaq School Application..."
 cd $APP_DIR
 
-# Stop service first
+# Stop systemd service first (if running)
 echo "💀 Stopping Gunicorn service..."
 systemctl stop $SERVICE_NAME || true
+
+# Kill any remaining Gunicorn processes manually
+echo "⚔️ Killing any leftover Gunicorn processes..."
+pkill -f "gunicorn" || true
+
+# Verify no Gunicorn processes are running
+echo "🔍 Verifying Gunicorn processes..."
+pgrep -fl gunicorn || echo "No Gunicorn processes running."
 
 # Pull latest changes
 echo "📥 Pulling latest changes from GitHub..."
@@ -18,7 +26,7 @@ git fetch origin main
 git reset --hard origin/main
 
 # Upgrade pip, setuptools, and wheel
-echo "⬆️  Upgrading pip, setuptools, and wheel..."
+echo "⬆️ Upgrading pip, setuptools, and wheel..."
 $VENV/pip install --upgrade pip setuptools wheel
 
 # Reinstall numpy and pandas cleanly
@@ -42,9 +50,8 @@ chmod -R 755 $APP_DIR
 chmod -R 775 $APP_DIR/static/uploads
 chmod -R 775 $APP_DIR/static/receipts
 
-# Restart Gunicorn service
-echo "🔄 Restarting service..."
-systemctl daemon-reload
-systemctl start $SERVICE_NAME
+# Start Gunicorn manually (instead of systemctl) in background
+echo "🚀 Starting Gunicorn..."
+$VENV/gunicorn -w 4 -b 127.0.0.1:8000 app:app &
 
 echo "✅ Update completed successfully!"
