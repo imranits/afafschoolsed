@@ -18,6 +18,9 @@ DB_CONFIG = {
     "database": "afaqschool1"
 }
 
+
+
+
 UPLOAD_FOLDER = "static/uploads"
 RECEIPT_FOLDER = "static/receipts"
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
@@ -77,6 +80,42 @@ def login():
             return redirect(url_for("home"))
 
     return render_template("login.html")
+
+@app.route("/", methods=["GET", "POST"])
+def login2():
+    if request.method == "POST":
+        role = request.form.get("role")
+        name = request.form.get("name")
+        mobile = request.form.get("mobile")
+        password = request.form.get("password")
+
+        if role == "admin":
+            if password == ADMIN_PASSWORD:
+                session["user"] = {
+                    "role": "admin",
+                    "name": name or "Admin",
+                    "mobile": ""
+                }
+                flash("Admin login successful", "success")
+                return redirect(url_for("home"))
+            else:
+                flash("Invalid admin password", "danger")
+                return render_template("login.html")
+        else:
+            if not name or not mobile:
+                flash("Please enter name and mobile", "danger")
+                return render_template("login.html")
+
+            session["user"] = {
+                "role": role,
+                "name": name,
+                "mobile": mobile
+            }
+            flash(f"{role.capitalize()} login successful", "success")
+            return redirect(url_for("home"))
+
+    return render_template("login.html")
+
 
 
 # HOME
