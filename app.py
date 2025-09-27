@@ -10,14 +10,12 @@ from io import BytesIO
 app = Flask(__name__)
 app.secret_key = "supersecret123"
 
-# ==== CONFIG ====
 DB_CONFIG = {
     "host": "localhost",
     "user": "root",
-    "password": "SecureRootPass123!",
-    "database": "afaqschool1"
+    "password": "Zain12345",
+    "database": "afaqschool"
 }
-
 
 
 
@@ -508,25 +506,35 @@ def approve_application(application_no):
     return redirect(url_for("review"))
 
 # ---------------- Export to Excel ----------------
+from flask import current_app
+
 @app.route("/export_excel")
 def export_excel():
-    if "user" not in session or session["user"]["role"] != "admin":
-        flash("براہ کرم پہلے لاگ ان کریں", "warning")
-        return redirect(url_for("login"))
+    try:
+        if "user" not in session or session["user"]["role"] != "admin":
+            flash("براہ کرم پہلے لاگ ان کریں", "warning")
+            return redirect(url_for("login"))
 
-    conn = get_db_connection()
-    df = pd.read_sql("SELECT * FROM applications", conn)
-    conn.close()
+        conn = get_db_connection()
+        df = pd.read_sql("SELECT * FROM applications", conn)
+        conn.close()
 
-    output = BytesIO()
-    df.to_excel(output, index=False)
-    output.seek(0)
+        output = BytesIO()
+        with pd.ExcelWriter(output, engine="xlsxwriter") as writer:
+            df.to_excel(writer, index=False, sheet_name="Applications")
+        output.seek(0)
 
-    return send_file(
-        output,
-        download_name="applications.xlsx",
-        as_attachment=True
-    )
+        return send_file(
+            output,
+            as_attachment=True,
+            download_name="applications.xlsx",
+            mimetype="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+        )
+
+    except Exception as e:
+        # 🔥 Log error to terminal
+        current_app.logger.error(f"Excel export failed: {e}")
+        return f"❌ Export failed: {e}", 500
 
 
 # ---------------- Export to PDF ----------------
