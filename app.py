@@ -10,6 +10,7 @@ from io import BytesIO
 app = Flask(__name__)
 app.secret_key = "supersecret123"
 
+#Remote
 DB_CONFIG = {
     "host": "localhost",
     "user": "root",
@@ -18,6 +19,13 @@ DB_CONFIG = {
 }
 
 
+#Local
+#DB_CONFIG = {
+ #   "host": "localhost",
+  #  "user": "root",
+   # "password": "Zain12345",
+   # "database": "afaqschool"
+#}
 
 UPLOAD_FOLDER = "static/uploads"
 RECEIPT_FOLDER = "static/receipts"
@@ -42,6 +50,8 @@ def get_next_application_no():
     return f"APP-{max_id+1:04d}"
 
 # ==== ROUTES ====
+#updated pwd
+
 
 # LOGIN
 @app.route("/", methods=["GET", "POST"])
@@ -64,42 +74,24 @@ def login():
             else:
                 flash("Invalid admin password", "danger")
                 return render_template("login.html")
-        else:
+
+        elif role == "donar":
+            # ✅ Ensure name and mobile are provided
             if not name or not mobile:
-                flash("Please enter name and mobile", "danger")
+                flash("Please enter name and mobile number", "danger")
                 return render_template("login.html")
 
+            # ✅ Save in session for later use
             session["user"] = {
-                "role": role,
+                "role": "donar",
                 "name": name,
                 "mobile": mobile
             }
-            flash(f"{role.capitalize()} login successful", "success")
+            flash("Donar login successful", "success")
             return redirect(url_for("home"))
 
-    return render_template("login.html")
-
-@app.route("/", methods=["GET", "POST"])
-def login2():
-    if request.method == "POST":
-        role = request.form.get("role")
-        name = request.form.get("name")
-        mobile = request.form.get("mobile")
-        password = request.form.get("password")
-
-        if role == "admin":
-            if password == ADMIN_PASSWORD:
-                session["user"] = {
-                    "role": "admin",
-                    "name": name or "Admin",
-                    "mobile": ""
-                }
-                flash("Admin login successful", "success")
-                return redirect(url_for("home"))
-            else:
-                flash("Invalid admin password", "danger")
-                return render_template("login.html")
         else:
+            # ✅ For all other roles
             if not name or not mobile:
                 flash("Please enter name and mobile", "danger")
                 return render_template("login.html")
@@ -260,21 +252,26 @@ def donor_confirm(application_no):
         filename = secure_filename(application_no + "_" + file.filename)
         filepath = os.path.join(app.config["UPLOAD_FOLDER"], filename)
         file.save(filepath)
+        app.logger.info(f"[DEBUG] Receipt saved: {filepath}")
 
         # Insert donation + update application status
         conn = get_db_connection()
         cursor = conn.cursor()
 
         try:
+            donor_name = f"{session['user']['name']} - {session['user']['mobile']}"
+            app.logger.info(f"[DEBUG] Preparing INSERT for application_no={application_no}, donor_name={donor_name}, file={filename}")
+
             # Insert into donations table
             cursor.execute("""
                 INSERT INTO donations (application_no, name, receipt_path)
                 VALUES (%s, %s, %s)
             """, (
                 application_no,
-                session["user"]["name"],  # donor name
+                donor_name,
                 filename
             ))
+            app.logger.info("[DEBUG] INSERT executed successfully")
 
             # Update application status
             cursor.execute("""
@@ -282,20 +279,25 @@ def donor_confirm(application_no):
                 SET status = 'Assigned'
                 WHERE application_no = %s
             """, (application_no,))
+            app.logger.info("[DEBUG] UPDATE executed successfully")
 
             conn.commit()
             flash("Donation confirmed, receipt uploaded, and application assigned successfully!", "success")
+            app.logger.info("[DEBUG] Transaction committed ✅")
 
         except Exception as e:
             conn.rollback()
             flash(f"Error: {str(e)}", "danger")
+            app.logger.error(f"[ERROR] Database error: {e}")
 
         finally:
             cursor.close()
             conn.close()
+            app.logger.info("[DEBUG] Connection closed")
 
         return redirect(url_for("donor_dashboard"))
 
+    app.logger.info(f"[DEBUG] GET request for donor_confirm page - application_no={application_no}")
     return render_template("donor_confirm.html", application_no=application_no)
 
 import pandas as pd
